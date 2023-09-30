@@ -1,6 +1,6 @@
 using AventStack.ExtentReports;
 using AventStack.ExtentReports.Reporter;
-using AventStack.ExtentReports.Reporter.Config;
+using AventStack.ExtentReports.Reporter.Configuration;
 using OpenQA.Selenium;
 
 namespace BDD_JourneyPlanner_Tests.Utilities;
@@ -17,9 +17,9 @@ public class ExtentReport
     public static void ExtentReportInIt()
     {
         var htmlReporter = new ExtentHtmlReporter(testOutPutPath);
-        htmlReporter.Config.ReportName = "Automation Test Report";
-        htmlReporter.Config.DocumentTitle = "Journey Planner Test Report";
-        htmlReporter.Config.Theme = Theme.Dark;
+        htmlReporter.Configuration().ReportName = "Automation Test Report";
+        htmlReporter.Configuration().DocumentTitle = "Journey Planner Test Report";
+        htmlReporter.Configuration().Theme = Theme.Dark;
 
         _ExtentReport = new ExtentReports();
         _ExtentReport.AttachReporter(htmlReporter);

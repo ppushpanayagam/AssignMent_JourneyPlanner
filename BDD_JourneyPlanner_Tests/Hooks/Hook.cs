@@ -51,7 +51,7 @@ namespace BDD_JourneyPlanner_Tests.Hooks
         }
 
         [AfterTestRun]
-        public void AfterTestRun()
+        public static void AfterTestRun()
         {
             ExtentReportTestTearDown();
         }
