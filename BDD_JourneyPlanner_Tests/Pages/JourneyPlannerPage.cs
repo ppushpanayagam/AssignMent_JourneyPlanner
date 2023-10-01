@@ -8,6 +8,20 @@ public class JourneyPlannerPage
 {
     private IWebDriver _driver;
     private WebDriverWait _wait;
+    
+    private string _fromLocation;
+    private string _destination;
+
+    public string FromLocation
+    {
+        get { return _fromLocation; }
+        set { _fromLocation = value; }
+    }
+    public string Destination
+    {
+        get { return _destination; }
+        set { _destination = value; }
+    }
 
     public JourneyPlannerPage(IWebDriver driver)
     {
@@ -36,6 +50,13 @@ public class JourneyPlannerPage
         get
         {
             return _driver.FindElement(By.Id("InputTo"));
+        }
+    }
+    IWebElement SelectFirstItemFromDestinationDropdown
+    {
+        get
+        {
+            return _driver.FindElement(By.Id("stops-recent-magic-searches-suggestion-0"));
         }
     }
     IWebElement JourneyPlannerButton
@@ -71,6 +92,13 @@ public class JourneyPlannerPage
         get
         {
             return _driver.FindElement(By.Id("jp-recent-tab-jp"));
+        }
+    }
+    IWebElement RecentJourneys
+    {
+        get
+        {
+            return _driver.FindElement(By.XPath("//div[@id='jp-recent-content-jp-']/a"));
         }
     }
     #endregion
@@ -113,11 +141,23 @@ public class JourneyPlannerPage
         return header;
     }
     
+    public string GetRecentSearchJourneys()
+    {
+        string recentJourneys = _wait.Until(x => RecentJourneys).Text;
+        return recentJourneys;
+    }
+    
     public JourneyPlannerPage EnterFromLocation(string fromLocation)
     {
         _wait.Until(x => FromLocationField).Clear();
         FromLocationField.SendKeys(fromLocation);
         return this;
+    }
+    
+    public string GetFromLocation()
+    {
+        string fromLocation = _wait.Until(x => FromLocationField).GetAttribute("value");
+        return fromLocation;
     }
     
     public JourneyPlannerPage EnterDestination(string destination)
@@ -126,6 +166,12 @@ public class JourneyPlannerPage
         _wait.Until(x => ToLocationField).Clear();
         ToLocationField.SendKeys(destination);
         return this;
+    }
+    
+    public string GetDestination()
+    {
+        string destination = _wait.Until(x => ToLocationField).GetAttribute("value");
+        return destination;
     }
     
     public JourneyPlannerPage ClickOnJourneyPlannerButton()

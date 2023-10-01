@@ -30,12 +30,11 @@ public class JourneySearchResultPage
             return _driver.FindElement(By.ClassName("jp-results-headline"));
         }
     }
-    
     IWebElement JourneyResultPageValidationErrorForInvalidJourneyDetails
     {
         get
         {
-            return _driver.FindElement(By.XPath("//li[contains(text(), 'Sorry')]"));
+            return _driver.FindElement(By.XPath("//ul[@class='field-validation-errors']/li"));
         }
     }
     IWebElement EditJourneyLink
@@ -66,7 +65,35 @@ public class JourneySearchResultPage
             return _driver.FindElement(By.Id("InputTo"));
         }
     }
+    IWebElement FromLocationFromResultPage
+    {
+        get
+        {
+            return _driver.FindElement(By.XPath("(//span[contains(text(), 'From:')]/following::strong)[1]"));
+        }
+    }
+    IWebElement DestinationFromResultPage
+    {
+        get
+        {
+            return _driver.FindElement(By.XPath("(//span[contains(text(), 'To:')]/following::strong)[1]"));
+        }
+    }
 
+    IWebElement ClearDestinationField
+    {
+        get
+        {
+            return _driver.FindElement(By.XPath("//a[contains(text(), 'Clear To location')]"));
+        }
+    }
+    IWebElement LaterJourneyLink
+    {
+        get
+        {
+            return _driver.FindElement(By.XPath("//a[contains(text(), 'Discover quieter times to travel')]"));
+        }
+    }
     #endregion
 
     public string VerifyJourneyResultPageTabHeader()
@@ -87,9 +114,9 @@ public class JourneySearchResultPage
         return header;
     }
     
-    public Boolean IsJourneyResultPageHeaderPresent()
+    public bool IsJourneyResultPageHeaderPresent()
     {
-        Boolean tabHeader = _wait.Until(x => JourneyResultPageHeader).Enabled;
+        bool tabHeader = _wait.Until(x => JourneyResultPageHeader).Displayed;
         return tabHeader;
     }
     
@@ -122,6 +149,30 @@ public class JourneySearchResultPage
         _wait.Until(x => Destination).Clear();
         Destination.SendKeys(destination);
         return this;
+    }
+    public JourneySearchResultPage UpdateDestination(string destination)
+    {
+        _wait.Until(x => ClearDestinationField).Click();
+        Destination.SendKeys(destination);
+        return this;
+    }
+    
+    public string GetFromLocation()
+    {
+        string fromLocation = _wait.Until(x => FromLocationFromResultPage).Text;
+        return fromLocation;
+    }
+    
+    public string GetToLocation()
+    {
+        string destination = _wait.Until(x => DestinationFromResultPage).Text;
+        return destination;
+    }
+    
+    public bool VerifyLaterJourneyButtonDisplayed()
+    {
+        bool laterJourneyButton = _wait.Until(x => LaterJourneyLink).Displayed;
+        return laterJourneyButton;
     }
     
 }

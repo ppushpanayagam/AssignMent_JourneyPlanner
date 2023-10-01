@@ -33,14 +33,14 @@ public sealed class JourneyPlannerStepDefinitions
     [Given(@"the user provide valid starting location")]
     public void GivenTheUserProvideValidStartingLocation()
     {
-        
+        journeyPlannerPage.FromLocation = "City of London, London Bridge";
         journeyPlannerPage.EnterFromLocation("City of London, London Bridge");
     }
 
     [Given(@"the user provide valid destination")]
     public void GivenTheUserProvideValidDestination()
     {
-        
+        journeyPlannerPage.Destination = "Leeds Rail Station";
         journeyPlannerPage.EnterDestination("Leeds Rail Station");
     }
 
@@ -59,12 +59,15 @@ public sealed class JourneyPlannerStepDefinitions
         Assert.AreEqual("Journey results", journeySearchResultPage.VerifyJourneyResultPageHeader());
     }
 
-    [Then(@"the user should see the search result")]
-    public void ThenTheUserShouldSeeTheSearchResult()
+    [Then(@"the user see the journey details on the search result")]
+    public void ThenTheUserSeeTheJourneyDetailsOnTheSearchResult()
     {
         
         Assert.AreEqual("Journey results", journeySearchResultPage.VerifyJourneyResultPageTabHeader());
         Assert.AreEqual("Journey results", journeySearchResultPage.VerifyJourneyResultPageHeader());
+        
+        Assert.AreEqual(journeyPlannerPage.FromLocation, journeySearchResultPage.GetFromLocation());
+        Assert.AreEqual(journeyPlannerPage.Destination, journeySearchResultPage.GetToLocation());
     }
 
     [Given(@"the user provide invalid starting location")]
@@ -94,8 +97,8 @@ public sealed class JourneyPlannerStepDefinitions
         journeyPlannerPage.ClickOnJourneyPlannerButton();
     }
 
-    [Then(@"the user should see validation error message")]
-    public void ThenTheUserShouldSeeValidationErrorMessage()
+    [Then(@"the user should get the validation error message")]
+    public void ThenTheUserShouldGetValidationErrorMessage()
     {
         
         Assert.AreEqual("The From field is required.", journeyPlannerPage.VerifyJourneyPlannerPageValidationErrorMessageForFromField());
@@ -106,13 +109,14 @@ public sealed class JourneyPlannerStepDefinitions
     public void ThenTheUserShouldNotRedirectedToJourneyResultPage()
     {
         
-        Assert.AreEqual(false, journeySearchResultPage.IsJourneyResultPageHeaderPresent());
+        Assert.IsFalse(journeySearchResultPage.IsJourneyResultPageHeaderPresent(), "Element should not be visible");
     }
 
     [Given(@"the user plan a journey with valid journey details")]
     public void GivenTheUserPlanAJourneyWithValidJourneyDetails()
     {
-        
+
+        journeyPlannerPage.FromLocation = "City of London, London Bridge";
         journeyPlannerPage.EnterFromLocation("City of London, London Bridge");
         journeyPlannerPage.EnterDestination("Leeds Rail Station");
         journeyPlannerPage.ClickOnJourneyPlannerButton();
@@ -129,29 +133,58 @@ public sealed class JourneyPlannerStepDefinitions
     public void WhenTheUserClickOnUpdateJourneyButtonToUpdateTheJourneyDetails()
     {
 
-        journeySearchResultPage.EnterDestination("Croydon (London), West Croydon Station");
+        journeyPlannerPage.Destination = "Croydon (London), West Croydon Station";
+        journeySearchResultPage.UpdateDestination(journeyPlannerPage.Destination);
         journeySearchResultPage.ClickOnUpdateJourneyButton();
     }
 
     [Given(@"the user decided to view the recent journey details")]
     public void GivenTheUserDecidedToViewTheRecentJourneyDetails()
     {
-        
+        journeyPlannerPage.FromLocation = journeyPlannerPage.GetFromLocation();
         journeyPlannerPage.EnterFromLocation("City of London, London Bridge");
         journeyPlannerPage.EnterDestination("Leeds Rail Station");
+        journeyPlannerPage.Destination = journeyPlannerPage.GetDestination();
         journeyPlannerPage.ClickOnJourneyPlannerButton();
+        Assert.AreEqual("Journey results", journeySearchResultPage.VerifyJourneyResultPageTabHeader());
+        Assert.AreEqual("Journey results", journeySearchResultPage.VerifyJourneyResultPageHeader());
+        Assert.AreEqual(journeyPlannerPage.FromLocation, journeySearchResultPage.GetFromLocation());
+        Assert.AreEqual(journeyPlannerPage.Destination, journeySearchResultPage.GetToLocation());
+        Assert.IsTrue(journeySearchResultPage.VerifyLaterJourneyButtonDisplayed(), "Element should be visible");
         journeySearchResultPage.ClickOnPlanJourneyTab();
     }
 
     [When(@"the user click on the recent button to view recent journeys")]
     public void WhenTheUserClickOnTheRecentButtonToViewRecentJourneys()
     {
+        
         journeyPlannerPage.ClickOnRecentTabButton();
     }
 
-    [Then(@"the user should see all the recent journeys")]
-    public void ThenTheUserShouldSeeAllTheRecentJourneys()
+    [Then(@"the user should be able to see all the recent journeys")]
+    public void ThenTheUserShouldBeAbleToSeeAllTheRecentJourneys()
     {
         
+        // Assert.That(journeyPlannerPage.FromLocation, Does.Contain(journeyPlannerPage.GetRecentSearchJourneys()));
+        Assert.That(journeyPlannerPage.Destination, Does.Contain(journeyPlannerPage.GetRecentSearchJourneys()));
+    }
+
+    [Given(@"the user provide invalid starting location (.*)")]
+    public void GivenTheUserProvideInvalidStartingLocation(string fromLocation)
+    {
+        journeyPlannerPage.EnterFromLocation(fromLocation);
+    }
+
+    [Given(@"the user provide invalid destination (.*)")]
+    public void GivenTheUserProvideInvalidDestination(string destination)
+    {
+        journeyPlannerPage.EnterDestination(destination);
+    }
+
+    [Then(@"the user should see (.*)")]
+    public void ThenTheUserShouldSeeValidationErrorMessage(string validationMessage)
+    {
+        
+        Assert.AreEqual(validationMessage, journeySearchResultPage.VerifyJourneyResultPageFieldValidationError());
     }
 }
